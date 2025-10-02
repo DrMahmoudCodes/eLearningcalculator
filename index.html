@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eLearning Project Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #66cbea 0%, #4b96a2ff 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4a94aa 0%, rgb(49, 100, 107) 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border-left: 4px solid #66cbea;
+        }
+
+        .section-title {
+            font-size: 1.4em;
+            margin-bottom: 20px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        select, input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        select:focus, input[type="number"]:focus {
+            outline: none;
+            border-color: #66cbea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .deliverable-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .deliverable-header {
+            font-weight: 600;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            color: #66cbea;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            flex: 1;
+            min-width: 150px;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-calculate {
+            background: linear-gradient(135deg, #66cbea 0%, #4b96a2ff 100%);
+            color: white;
+        }
+
+        .btn-calculate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-reset {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-reset:hover {
+            background: #5a6268;
+        }
+
+        .results {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .results.show {
+            display: block;
+        }
+
+        .results-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .total-price {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, #66cbea 0%, #4b96a2ff 100%);
+            color: white;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .total-price h2 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .total-price .amount {
+            font-size: 3em;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+
+        .total-price .range {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .currency-switch {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.5em;
+            }
+
+            .input-row {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+
+            .total-price .amount {
+                font-size: 2em;
+            }
+
+            table {
+                font-size: 0.9em;
+            }
+
+            th, td {
+                padding: 8px;
+            }
+        }
+
+        .highlight {
+            background: #fff3cd;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        footer {
+            text-align: center;
+            padding: 15px;
+            font-size: 0.9em;
+            color: white;
+            margin-top: 20px;
+        }
+        footer a {
+            color: #001eff;
+            text-decoration: none;
+            font-size: 1.3em;
+        }
+        footer a:hover {
+            text-decoration: underline;
+            color: #07e6ff;
+            font-size: 1.3em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 eLearning Project Price Calculator</h1>
+            <p>This Tool Helps Freelancers and eLearning Professionals Estimate your project cost with detailed breakdown and payment milestones</p>
+        </div>
+
+        <div class="content">
+            <div class="section">
+                <div class="section-title">💱 Currency Selection</div>
+                <div class="form-group">
+                    <label for="currency">Select Currency</label>
+                    <select id="currency">
+                        <option value="EGP">Egyptian Pound (EGP)</option>
+                        <option value="SAR">Saudi Riyal (SAR)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">📦 Deliverables</div>
+                
+                <div class="deliverable-card">
+                    <div class="deliverable-header">📄 Storyboard</div>
+                    <div class="input-row">
+                        <div class="form-group">
+                            <label>Number of Units</label>
+                            <input type="number" id="storyboard-units" min="0" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Slides per Unit</label>
+                            <input type="number" id="storyboard-slides" min="0" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Level of Detail</label>
+                            <select id="storyboard-detail">
+                                <option value="1.0">Basic (×1.0)</option>
+                                <option value="1.25">Medium (×1.25)</option>
+                                <option value="1.5">High (×1.5)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Level of Interactivity</label>
+                            <select id="storyboard-interactivity">
+                                <option value="1.0">Low (×1.0)</option>
+                                <option value="1.15">Medium (×1.15)</option>
+                                <option value="1.3">High (×1.3)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="deliverable-card">
+                    <div class="deliverable-header">🎓 eLearning Module Level 1</div>
+                    <div class="input-row">
+                        <div class="form-group">
+                            <label>Number of Units</label>
+                            <input type="number" id="level1-units" min="0" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Slides per Unit</label>
+                            <input type="number" id="level1-slides" min="0" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Level of Detail</label>
+                            <select id="level1-detail">
+                                <option value="1.0">Basic (×1.0)</option>
+                                <option value="1.25">Medium (×1.25)</option>
+                                <option value="1.5">High (×1.5)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Level of Interactivity</label>
+                            <select id="level1-interactivity">
+                                <option value="1.0">Low (×1.0)</option>
+                                <option value="1.15">Medium (×1.15)</option>
+                                <option value="1.3">High (×1.3)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="deliverable-card">
+                    <div class="deliverable-header">🎓 eLearning Module Level 2</div>
+                    <div class="input-row">
+                        <div class="form-group">
+                            <label>Number of Units</label>
+                            <input type="number" id="level2-units" min="0" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Slides per Unit</label>
+                            <input type="number" id="level2-slides" min="0" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Level of Detail</label>
+                            <select id="level2-detail">
+                                <option value="1.0">Basic (×1.0)</option>
+                                <option value="1.25">Medium (×1.25)</option>
+                                <option value="1.5">High (×1.5)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Level of Interactivity</label>
+                            <select id="level2-interactivity">
+                                <option value="1.0">Low (×1.0)</option>
+                                <option value="1.15">Medium (×1.15)</option>
+                                <option value="1.3">High (×1.3)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="deliverable-card">
+                    <div class="deliverable-header">🎓 eLearning Module Level 3</div>
+                    <div class="input-row">
+                        <div class="form-group">
+                            <label>Number of Units</label>
+                            <input type="number" id="level3-units" min="0" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Slides per Unit</label>
+                            <input type="number" id="level3-slides" min="0" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Level of Detail</label>
+                            <select id="level3-detail">
+                                <option value="1.0">Basic (×1.0)</option>
+                                <option value="1.25">Medium (×1.25)</option>
+                                <option value="1.5">High (×1.5)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Level of Interactivity</label>
+                            <select id="level3-interactivity">
+                                <option value="1.0">Low (×1.0)</option>
+                                <option value="1.15">Medium (×1.15)</option>
+                                <option value="1.3">High (×1.3)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="deliverable-card">
+                    <div class="deliverable-header">🎓 eLearning Module Level 4</div>
+                    <div class="input-row">
+                        <div class="form-group">
+                            <label>Number of Units</label>
+                            <input type="number" id="level4-units" min="0" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Slides per Unit</label>
+                            <input type="number" id="level4-slides" min="0" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Level of Detail</label>
+                            <select id="level4-detail">
+                                <option value="1.0">Basic (×1.0)</option>
+                                <option value="1.25">Medium (×1.25)</option>
+                                <option value="1.5">High (×1.5)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Level of Interactivity</label>
+                            <select id="level4-interactivity">
+                                <option value="1.0">Low (×1.0)</option>
+                                <option value="1.15">Medium (×1.15)</option>
+                                <option value="1.3">High (×1.3)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn-calculate" onclick="calculatePrice()">💰 Calculate Price</button>
+                <button class="btn-reset" onclick="resetForm()">🔄 Reset</button>
+            </div>
+
+            <div class="results" id="results">
+                <div class="total-price">
+                    <h2>Total Project Estimate</h2>
+                    <div class="amount" id="totalAmount">0</div>
+                    <div class="range" id="priceRange">Range: 0 - 0</div>
+                </div>
+
+                <div class="results-card">
+                    <h3 style="margin-bottom: 15px;">📊 Deliverables Breakdown</h3>
+                    <table id="breakdownTable">
+                        <thead>
+                            <tr>
+                                <th>Deliverable</th>
+                                <th>Units</th>
+                                <th>Slides/Unit</th>
+                                <th>Detail Level</th>
+                                <th>Interactivity</th>
+                                <th>Unit Price</th>
+                                <th>Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody id="breakdownBody"></tbody>
+                    </table>
+                </div>
+
+                <div class="results-card">
+                    <h3 style="margin-bottom: 15px;">💳 Payment Milestones</h3>
+                    <table id="paymentTable">
+                        <thead>
+                            <tr>
+                                <th>Payment Stage</th>
+                                <th>Percentage</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id="paymentBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer>
+        Made with ❤️ by Dr Mahmoud - 2025 all rights reserved. <a href="https://www.linkedin.com/in/mahmoud-hesham-351527246/" target="_blank">LinkedIn</a>
+    </footer>
+
+    <script>
+        const rates = {
+            EGP: {
+                storyboard: 2000,
+                level1: 5000,
+                level2: 10000,
+                level3: 15000,
+                level4: 20000,
+                slideFactor: 100
+            },
+            SAR: {
+                storyboard: 500,
+                level1: 1250,
+                level2: 2500,
+                level3: 3750,
+                level4: 5000,
+                slideFactor: 25
+            }
+        };
+
+        const deliverables = [
+            { id: 'storyboard', name: 'Storyboard', emoji: '📄' },
+            { id: 'level1', name: 'eLearning Module Level 1', emoji: '🎓' },
+            { id: 'level2', name: 'eLearning Module Level 2', emoji: '🎓' },
+            { id: 'level3', name: 'eLearning Module Level 3', emoji: '🎓' },
+            { id: 'level4', name: 'eLearning Module Level 4', emoji: '🎓' }
+        ];
+
+        function calculatePrice() {
+            const currency = document.getElementById('currency').value;
+            const currencyRates = rates[currency];
+            let totalPrice = 0;
+            const breakdown = [];
+
+            deliverables.forEach(deliverable => {
+                const units = parseInt(document.getElementById(`${deliverable.id}-units`).value) || 0;
+                const slides = parseInt(document.getElementById(`${deliverable.id}-slides`).value) || 0;
+                const detail = parseFloat(document.getElementById(`${deliverable.id}-detail`).value);
+                const interactivity = parseFloat(document.getElementById(`${deliverable.id}-interactivity`).value);
+
+                if (units > 0) {
+                    const baseRate = currencyRates[deliverable.id];
+                    const unitPrice = baseRate * detail * interactivity;
+                    const slidesCost = slides * currencyRates.slideFactor * units;
+                    const subtotal = (units * unitPrice) + slidesCost;
+
+                    totalPrice += subtotal;
+
+                    const detailText = detail === 1.0 ? 'Basic' : detail === 1.25 ? 'Medium' : 'High';
+                    const interactivityText = interactivity === 1.0 ? 'Low' : interactivity === 1.15 ? 'Medium' : 'High';
+
+                    breakdown.push({
+                        name: deliverable.name,
+                        emoji: deliverable.emoji,
+                        units: units,
+                        slides: slides,
+                        detail: detailText,
+                        interactivity: interactivityText,
+                        unitPrice: unitPrice.toFixed(2),
+                        subtotal: subtotal.toFixed(2)
+                    });
+                }
+            });
+
+            if (totalPrice === 0) {
+                alert('Please add at least one deliverable with units.');
+                return;
+            }
+
+            displayResults(totalPrice, currency, breakdown);
+        }
+
+        function displayResults(total, currency, breakdown) {
+            const minRange = (total * 0.9).toFixed(2);
+            const maxRange = (total * 1.1).toFixed(2);
+
+            document.getElementById('totalAmount').textContent = `${formatNumber(total.toFixed(2))} ${currency}`;
+            document.getElementById('priceRange').textContent = `Range: ${formatNumber(minRange)} - ${formatNumber(maxRange)} ${currency}`;
+
+            const breakdownBody = document.getElementById('breakdownBody');
+            breakdownBody.innerHTML = '';
+
+            breakdown.forEach(item => {
+                const row = `
+                    <tr>
+                        <td>${item.emoji} ${item.name}</td>
+                        <td>${item.units}</td>
+                        <td>${item.slides}</td>
+                        <td>${item.detail}</td>
+                        <td>${item.interactivity}</td>
+                        <td>${formatNumber(item.unitPrice)} ${currency}</td>
+                        <td><strong>${formatNumber(item.subtotal)} ${currency}</strong></td>
+                    </tr>
+                `;
+                breakdownBody.innerHTML += row;
+            });
+
+            const paymentBody = document.getElementById('paymentBody');
+            paymentBody.innerHTML = '';
+
+            const milestones = [
+                { stage: 'Upfront (Before Start)', percent: 50 },
+                { stage: 'Milestone 1', percent: 20 },
+                { stage: 'Milestone 2', percent: 20 },
+                { stage: 'Final Delivery', percent: 10 }
+            ];
+
+            milestones.forEach(milestone => {
+                const amount = (total * milestone.percent / 100).toFixed(2);
+                const row = `
+                    <tr>
+                        <td>${milestone.stage}</td>
+                        <td>${milestone.percent}%</td>
+                        <td><strong>${formatNumber(amount)} ${currency}</strong></td>
+                    </tr>
+                `;
+                paymentBody.innerHTML += row;
+            });
+
+            document.getElementById('results').classList.add('show');
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function formatNumber(num) {
+            return parseFloat(num).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function resetForm() {
+            deliverables.forEach(deliverable => {
+                document.getElementById(`${deliverable.id}-units`).value = 0;
+                document.getElementById(`${deliverable.id}-slides`).value = 0;
+                document.getElementById(`${deliverable.id}-detail`).value = '1.0';
+                document.getElementById(`${deliverable.id}-interactivity`).value = '1.0';
+            });
+
+            document.getElementById('results').classList.remove('show');
+        }
+    </script>
+</body>
+</html>
