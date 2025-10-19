@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>eLearning Project Calculator</title>
+    <title>eLearning Projects - Cost Calculator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -13,7 +14,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #66cbea 0%, #4b96a2ff 100%);
+            background: linear-gradient(135deg, #0d7377 0%, #14a085 100%);
             min-height: 100vh;
             padding: 20px;
         }
@@ -23,46 +24,52 @@
             margin: 0 auto;
             background: white;
             border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             overflow: hidden;
         }
 
         .header {
-            background: linear-gradient(135deg, #4a94aa 0%, rgb(49, 100, 107) 100%);
+            background: linear-gradient(135deg, #0d7377 0%, #14a085 100%);
             color: white;
-            padding: 30px;
+            padding: 40px;
             text-align: center;
         }
 
         .header h1 {
-            font-size: 2em;
+            font-size: 2.5em;
             margin-bottom: 10px;
         }
 
         .header p {
-            opacity: 0.9;
             font-size: 1.1em;
+            opacity: 0.9;
         }
 
         .content {
-            padding: 30px;
+            padding: 40px;
         }
 
         .section {
-            margin-bottom: 30px;
+            margin-bottom: 35px;
             padding: 25px;
-            background: #f8f9fa;
+            background: #f8fcfc;
             border-radius: 12px;
-            border-left: 4px solid #66cbea;
+            border-left: 4px solid #14a085;
         }
 
-        .section-title {
-            font-size: 1.4em;
+        .section h2 {
+            color: #0d7377;
             margin-bottom: 20px;
-            color: #333;
+            font-size: 1.5em;
             display: flex;
             align-items: center;
             gap: 10px;
+        }
+
+        .section h2::before {
+            content: "▶";
+            color: #14a085;
+            font-size: 0.8em;
         }
 
         .form-group {
@@ -72,571 +79,778 @@
         label {
             display: block;
             margin-bottom: 8px;
+            color: #0d7377;
             font-weight: 600;
-            color: #555;
+            font-size: 1em;
         }
 
-        select, input[type="number"] {
+        input[type="number"],
+        select {
             width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
+            padding: 12px 15px;
+            border: 2px solid #d0e8e8;
             border-radius: 8px;
             font-size: 1em;
             transition: all 0.3s;
-        }
-
-        select:focus, input[type="number"]:focus {
-            outline: none;
-            border-color: #66cbea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .deliverable-card {
             background: white;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
-        .deliverable-header {
-            font-weight: 600;
-            font-size: 1.1em;
-            margin-bottom: 15px;
-            color: #66cbea;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #f0f0f0;
+        input[type="number"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #14a085;
+            box-shadow: 0 0 0 3px rgba(20, 160, 133, 0.1);
         }
 
-        .input-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
-        }
-
-        .button-group {
+        .checkbox-group {
             display: flex;
-            gap: 15px;
-            margin-top: 30px;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #14a085;
+        }
+
+        .checkbox-group label {
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .info-box {
+            background: #e8f5f4;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #0d7377;
+            line-height: 1.6;
+        }
+
+        .info-box strong {
+            color: #0d7377;
+            display: block;
+            margin-top: 8px;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 20px;
             flex-wrap: wrap;
         }
 
-        button {
-            flex: 1;
-            min-width: 150px;
-            padding: 15px 30px;
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .radio-option input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #14a085;
+        }
+
+        .radio-option label {
+            margin: 0;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .btn-calculate {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #14a085 0%, #0d7377 100%);
+            color: white;
             border: none;
+            border-radius: 12px;
+            font-size: 1.2em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 20px;
+        }
+
+        .btn-calculate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(20, 160, 133, 0.3);
+        }
+
+        .btn-calculate:active {
+            transform: translateY(0);
+        }
+
+        .results {
+            display: none;
+            margin-top: 40px;
+            padding: 30px;
+            background: linear-gradient(135deg, #f8fcfc 0%, #e8f5f4 100%);
+            border-radius: 12px;
+            border: 2px solid #14a085;
+        }
+
+        .results.show {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .results h2 {
+            color: #0d7377;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+            text-align: center;
+        }
+
+        .cost-summary {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .cost-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #e0f0f0;
+        }
+
+        .cost-item:last-child {
+            border-bottom: none;
+        }
+
+        .cost-item strong {
+            color: #0d7377;
+        }
+
+        .total-cost {
+            background: linear-gradient(135deg, #0d7377 0%, #14a085 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1.5em;
+            font-weight: 700;
+            margin: 25px 0;
+        }
+
+        .milestones {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .milestones h3 {
+            color: #0d7377;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .milestone-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px;
+            margin-bottom: 10px;
+            background: #f8fcfc;
             border-radius: 8px;
+            border-left: 4px solid #14a085;
+        }
+
+        .btn-download {
+            width: 100%;
+            padding: 15px;
+            background: #0d7377;
+            color: white;
+            border: none;
+            border-radius: 10px;
             font-size: 1.1em;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
         }
 
-        .btn-calculate {
-            background: linear-gradient(135deg, #66cbea 0%, #4b96a2ff 100%);
-            color: white;
-        }
-
-        .btn-calculate:hover {
+        .btn-download:hover {
+            background: #14a085;
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 8px 20px rgba(13, 115, 119, 0.3);
         }
 
-        .btn-reset {
-            background: #6c757d;
-            color: white;
-        }
-
-        .btn-reset:hover {
-            background: #5a6268;
-        }
-
-        .results {
-            display: none;
-            margin-top: 30px;
-        }
-
-        .results.show {
-            display: block;
-        }
-
-        .results-card {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-
-        .total-price {
-            text-align: center;
-            padding: 30px;
-            background: linear-gradient(135deg, #66cbea 0%, #4b96a2ff 100%);
-            color: white;
-            border-radius: 12px;
-            margin-bottom: 20px;
-        }
-
-        .total-price h2 {
-            font-size: 1.5em;
-            margin-bottom: 10px;
-        }
-
-        .total-price .amount {
-            font-size: 3em;
-            font-weight: bold;
-            margin: 15px 0;
-        }
-
-        .total-price .range {
-            font-size: 1.1em;
-            opacity: 0.9;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #e0e0e0;
-        }
-
-        th {
-            background: #f8f9fa;
-            font-weight: 600;
-            color: #333;
-        }
-
-        tr:hover {
-            background: #f8f9fa;
-        }
-
-        .currency-switch {
-            display: flex;
-            gap: 10px;
-            align-items: center;
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
         }
 
         @media (max-width: 768px) {
-            .header h1 {
-                font-size: 1.5em;
-            }
-
-            .input-row {
+            .grid-2 {
                 grid-template-columns: 1fr;
             }
 
-            .button-group {
-                flex-direction: column;
+            .header h1 {
+                font-size: 1.8em;
             }
 
-            button {
-                width: 100%;
+            .content {
+                padding: 20px;
             }
 
-            .total-price .amount {
-                font-size: 2em;
-            }
-
-            table {
-                font-size: 0.9em;
-            }
-
-            th, td {
-                padding: 8px;
+            .section {
+                padding: 20px;
             }
         }
 
-        .highlight {
-            background: #fff3cd;
-            padding: 2px 6px;
-            border-radius: 4px;
+        .interactivity-cards {
+            display: grid;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .interactivity-card {
+            padding: 15px;
+            border: 2px solid #d0e8e8;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .interactivity-card:hover {
+            border-color: #14a085;
+            background: #f8fcfc;
+        }
+
+        .interactivity-card.selected {
+            border-color: #14a085;
+            background: #e8f5f4;
+        }
+
+        .interactivity-card input[type="radio"] {
+            display: none;
+        }
+
+        .card-title {
+            font-weight: 600;
+            color: #0d7377;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+
+        .card-description {
+            font-size: 0.9em;
+            color: #555;
+            line-height: 1.5;
+        }
+        #projectName{
+            border: 1px solid #d0e8e8;
+            border-radius: 5px;
+            padding: 10px;
+            width: 95%;
+            height: 45px;
+            box-sizing: border-box;
+            
         }
         footer {
             text-align: center;
-            padding: 15px;
-            font-size: 0.9em;
+            padding: 10px;
             color: white;
-            margin-top: 20px;
         }
         footer a {
-            color: #001eff;
+            color: #20f8ff;
             text-decoration: none;
-            font-size: 1.3em;
         }
         footer a:hover {
+            color: #aefbfe;
             text-decoration: underline;
-            color: #07e6ff;
-            font-size: 1.3em;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>📚 eLearning Project Price Calculator</h1>
-            <p>This Tool Helps Freelancers and eLearning Professionals Estimate your project cost with detailed breakdown and payment milestones</p>
+            <h1> eLearning Projects - Cost Calculator </h1>
+            <p>A Professional estimation tool for eLearning projects across the MENA region </p>
         </div>
 
         <div class="content">
-            <div class="section">
-                <div class="section-title">💱 Currency Selection</div>
-                <div class="form-group">
-                    <label for="currency">Select Currency</label>
-                    <select id="currency">
-                        <option value="EGP">Egyptian Pound (EGP)</option>
-                        <option value="SAR">Saudi Riyal (SAR)</option>
-                    </select>
+            <form id="calculatorForm">
+                <!-- Basic Information -->
+                <div class="section">
+                    <h2>Basic Project Information</h2>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label for="projectName">Project Name</label>
+                            <input type="text" id="projectName" placeholder="Enter project name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="currency">Currency</label>
+                            <select id="currency" required>
+                                <option value="EGP">Egyptian Pound (EGP)</option>
+                                <option value="SAR">Saudi Riyal (SAR)</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-            <div class="section">
-                <div class="section-title">📦 Deliverables</div>
+                <!-- Content Scope -->
+                <div class="section">
+                    <h2>Content Scope</h2>
+                    <div class="form-group">
+                        <label>Calculation Method</label>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" id="methodWords" name="calcMethod" value="words" checked>
+                                <label for="methodWords">Number of Words</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="methodSlides" name="calcMethod" value="slides">
+                                <label for="methodSlides">Number of Slides</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="methodMinutes" name="calcMethod" value="minutes">
+                                <label for="methodMinutes">Duration (Minutes)</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="methodHours" name="calcMethod" value="hours">
+                                <label for="methodHours">Duration (Hours)</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid-2">
+                        <div class="form-group" id="wordsGroup">
+                            <label for="wordCount">Number of Words</label>
+                            <input type="number" id="wordCount" min="0" value="1000">
+                            <div class="info-box">90 words = 1 minute of content</div>
+                        </div>
+                        <div class="form-group" id="slidesGroup" style="display:none;">
+                            <label for="slideCount">Number of Slides</label>
+                            <input type="number" id="slideCount" min="0" value="20">
+                            <div class="info-box">Average: 100-150 words per slide</div>
+                        </div>
+                        <div class="form-group" id="minutesGroup" style="display:none;">
+                            <label for="minuteCount">Duration (Minutes)</label>
+                            <input type="number" id="minuteCount" min="0" value="10">
+                        </div>
+                        <div class="form-group" id="hoursGroup" style="display:none;">
+                            <label for="hourCount">Duration (Hours)</label>
+                            <input type="number" id="hourCount" min="0" step="0.5" value="1">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interactivity Level -->
+                <div class="section">
+                    <h2>Interactivity Level</h2>
+                    <div class="interactivity-cards">
+                        <label class="interactivity-card selected" for="level1">
+                            <input type="radio" name="interactivity" id="level1" value="1" checked>
+                            <div class="card-title">Level 1: Passive Viewing</div>
+                            <div class="card-description">Basic presentation with text, images, and simple navigation. Minimal interaction - mostly reading and page turning. Suitable for information delivery and basic training.</div>
+                        </label>
+
+                        <label class="interactivity-card" for="level2">
+                            <input type="radio" name="interactivity" id="level2" value="2">
+                            <div class="card-title">Level 2: Limited Interaction</div>
+                            <div class="card-description">Includes basic quizzes, clickable hotspots, simple animations, and basic assessments. Learner can control pace and make simple choices. Good for knowledge checks and engagement.</div>
+                        </label>
+
+                        <label class="interactivity-card" for="level3">
+                            <input type="radio" name="interactivity" id="level3" value="3">
+                            <div class="card-title">Level 3: Complex Interaction</div>
+                            <div class="card-description">Features branching scenarios, drag-and-drop activities, simulations, interactive exercises, and detailed feedback. Learner decisions affect the learning path. Ideal for skill development.</div>
+                        </label>
+
+                        <label class="interactivity-card" for="level4">
+                            <input type="radio" name="interactivity" id="level4" value="4">
+                            <div class="card-title">Level 4: Advanced Simulation</div>
+                            <div class="card-description">Real-world simulations, complex problem-solving scenarios, AI-driven responses, 3D interactions, and immersive experiences. Highly customized with adaptive learning paths. Premium quality for critical training.</div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Additional Features -->
+                <div class="section">
+                    <h2>Additional Features</h2>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="voiceover">
+                                <label for="voiceover">Professional Voice Over (Arabic/English)</label>
+                            </div>
+                            <div class="info-box">Includes professional voice talent, recording, and editing</div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="gamification">
+                                <label for="gamification">Gamification Elements</label>
+                            </div>
+                            <div class="info-box">Points, badges, leaderboards, achievements, and game mechanics</div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="customGraphics">
+                                <label for="customGraphics">Custom Graphics & Illustrations</label>
+                            </div>
+                            <div class="info-box">Original artwork, custom icons, and branded visuals</div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="videoProduction">
+                                <label for="videoProduction">Video Production</label>
+                            </div>
+                            <div class="info-box">Professional video recording, editing, and integration</div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="translation">
+                                <label for="translation">Translation & Localization</label>
+                            </div>
+                            <div class="info-box">Professional translation with cultural adaptation</div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="lmsIntegration">
+                                <label for="lmsIntegration">LMS Integration & SCORM</label>
+                            </div>
+                            <div class="info-box">Full LMS compatibility and tracking setup</div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-calculate">📊 Calculate Project Cost</button>
+            </form>
+
+            <!-- Results Section -->
+            <div id="results" class="results">
+                <h2>💼 Project Cost Estimation</h2>
                 
-                <div class="deliverable-card">
-                    <div class="deliverable-header">📄 Storyboard</div>
-                    <div class="input-row">
-                        <div class="form-group">
-                            <label>Number of Units</label>
-                            <input type="number" id="storyboard-units" min="0" value="0">
-                        </div>
-                        <div class="form-group">
-                            <label>Slides per Unit</label>
-                            <input type="number" id="storyboard-slides" min="0" value="0">
-                        </div>
-                        <div class="form-group">
-                            <label>Level of Detail</label>
-                            <select id="storyboard-detail">
-                                <option value="1.0">Basic (×1.0)</option>
-                                <option value="1.25">Medium (×1.25)</option>
-                                <option value="1.5">High (×1.5)</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Level of Interactivity</label>
-                            <select id="storyboard-interactivity">
-                                <option value="1.0">Low (×1.0)</option>
-                                <option value="1.15">Medium (×1.15)</option>
-                                <option value="1.3">High (×1.3)</option>
-                            </select>
-                        </div>
-                    </div>
+                <div class="cost-summary">
+                    <h3 style="color: #0d7377; margin-bottom: 15px;">Cost Breakdown</h3>
+                    <div id="costBreakdown"></div>
                 </div>
 
-                <div class="deliverable-card">
-                    <div class="deliverable-header">🎓 eLearning Module Level 1</div>
-                    <div class="input-row">
-                        <div class="form-group">
-                            <label>Number of Units</label>
-                            <input type="number" id="level1-units" min="0" value="0">
-                        </div>
-                        <div class="form-group">
-                            <label>Slides per Unit</label>
-                            <input type="number" id="level1-slides" min="0" value="0">
-                        </div>
-                        <div class="form-group">
-                            <label>Level of Detail</label>
-                            <select id="level1-detail">
-                                <option value="1.0">Basic (×1.0)</option>
-                                <option value="1.25">Medium (×1.25)</option>
-                                <option value="1.5">High (×1.5)</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Level of Interactivity</label>
-                            <select id="level1-interactivity">
-                                <option value="1.0">Low (×1.0)</option>
-                                <option value="1.15">Medium (×1.15)</option>
-                                <option value="1.3">High (×1.3)</option>
-                            </select>
-                        </div>
-                    </div>
+                <div class="total-cost">
+                    <div style="font-size: 0.8em; opacity: 0.9; margin-bottom: 5px;">Total Project Cost</div>
+                    <div id="totalCost"></div>
                 </div>
 
-                <div class="deliverable-card">
-                    <div class="deliverable-header">🎓 eLearning Module Level 2</div>
-                    <div class="input-row">
-                        <div class="form-group">
-                            <label>Number of Units</label>
-                            <input type="number" id="level2-units" min="0" value="0">
-                        </div>
-                        <div class="form-group">
-                            <label>Slides per Unit</label>
-                            <input type="number" id="level2-slides" min="0" value="0">
-                        </div>
-                        <div class="form-group">
-                            <label>Level of Detail</label>
-                            <select id="level2-detail">
-                                <option value="1.0">Basic (×1.0)</option>
-                                <option value="1.25">Medium (×1.25)</option>
-                                <option value="1.5">High (×1.5)</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Level of Interactivity</label>
-                            <select id="level2-interactivity">
-                                <option value="1.0">Low (×1.0)</option>
-                                <option value="1.15">Medium (×1.15)</option>
-                                <option value="1.3">High (×1.3)</option>
-                            </select>
-                        </div>
-                    </div>
+                <div class="milestones">
+                    <h3>💰 Payment Milestones</h3>
+                    <div id="milestones"></div>
                 </div>
 
-                <div class="deliverable-card">
-                    <div class="deliverable-header">🎓 eLearning Module Level 3</div>
-                    <div class="input-row">
-                        <div class="form-group">
-                            <label>Number of Units</label>
-                            <input type="number" id="level3-units" min="0" value="0">
-                        </div>
-                        <div class="form-group">
-                            <label>Slides per Unit</label>
-                            <input type="number" id="level3-slides" min="0" value="0">
-                        </div>
-                        <div class="form-group">
-                            <label>Level of Detail</label>
-                            <select id="level3-detail">
-                                <option value="1.0">Basic (×1.0)</option>
-                                <option value="1.25">Medium (×1.25)</option>
-                                <option value="1.5">High (×1.5)</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Level of Interactivity</label>
-                            <select id="level3-interactivity">
-                                <option value="1.0">Low (×1.0)</option>
-                                <option value="1.15">Medium (×1.15)</option>
-                                <option value="1.3">High (×1.3)</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="deliverable-card">
-                    <div class="deliverable-header">🎓 eLearning Module Level 4</div>
-                    <div class="input-row">
-                        <div class="form-group">
-                            <label>Number of Units</label>
-                            <input type="number" id="level4-units" min="0" value="0">
-                        </div>
-                        <div class="form-group">
-                            <label>Slides per Unit</label>
-                            <input type="number" id="level4-slides" min="0" value="0">
-                        </div>
-                        <div class="form-group">
-                            <label>Level of Detail</label>
-                            <select id="level4-detail">
-                                <option value="1.0">Basic (×1.0)</option>
-                                <option value="1.25">Medium (×1.25)</option>
-                                <option value="1.5">High (×1.5)</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Level of Interactivity</label>
-                            <select id="level4-interactivity">
-                                <option value="1.0">Low (×1.0)</option>
-                                <option value="1.15">Medium (×1.15)</option>
-                                <option value="1.3">High (×1.3)</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="button-group">
-                <button class="btn-calculate" onclick="calculatePrice()">💰 Calculate Price</button>
-                <button class="btn-reset" onclick="resetForm()">🔄 Reset</button>
-            </div>
-
-            <div class="results" id="results">
-                <div class="total-price">
-                    <h2>Total Project Estimate</h2>
-                    <div class="amount" id="totalAmount">0</div>
-                    <div class="range" id="priceRange">Range: 0 - 0</div>
-                </div>
-
-                <div class="results-card">
-                    <h3 style="margin-bottom: 15px;">📊 Deliverables Breakdown</h3>
-                    <table id="breakdownTable">
-                        <thead>
-                            <tr>
-                                <th>Deliverable</th>
-                                <th>Units</th>
-                                <th>Slides/Unit</th>
-                                <th>Detail Level</th>
-                                <th>Interactivity</th>
-                                <th>Unit Price</th>
-                                <th>Subtotal</th>
-                            </tr>
-                        </thead>
-                        <tbody id="breakdownBody"></tbody>
-                    </table>
-                </div>
-
-                <div class="results-card">
-                    <h3 style="margin-bottom: 15px;">💳 Payment Milestones</h3>
-                    <table id="paymentTable">
-                        <thead>
-                            <tr>
-                                <th>Payment Stage</th>
-                                <th>Percentage</th>
-                                <th>Amount</th>
-                            </tr>
-                        </thead>
-                        <tbody id="paymentBody"></tbody>
-                    </table>
-                </div>
+                <button id="downloadPDF" class="btn-download">📥 Download Detailed Invoice (PDF)</button>
             </div>
         </div>
     </div>
     <footer>
-        Made with ❤️ by Dr Mahmoud - 2025 all rights reserved. <a href="https://www.linkedin.com/in/mahmoud-hesham-351527246/" target="_blank">LinkedIn</a>
+        Developed with ❤️ by <a href="https://drmahmoudhesham.netlify.app/" target="_blank"> Dr Mahmoud </a>
     </footer>
 
     <script>
-        const rates = {
+        // Pricing configuration (rates per word equivalent)
+        const pricing = {
             EGP: {
-                storyboard: 2000,
-                level1: 5000,
-                level2: 10000,
-                level3: 15000,
-                level4: 20000,
-                slideFactor: 100
+                baseRate: {1:1.0, 2:1.5, 3:2.5, 4:4.0},
+                voiceover: 0.7,
+                gamification: 0.9,
+                customGraphics: 0.7,
+                videoProduction: 1.5,
+                translation: 0.55,
+                lmsIntegration: 1500
             },
             SAR: {
-                storyboard: 500,
-                level1: 1250,
-                level2: 2500,
-                level3: 3750,
-                level4: 5000,
-                slideFactor: 25
+                baseRate: {1:0.30,2:0.50,3:0.80,4:1.20},
+                voiceover: 0.3,
+                gamification: 0.35,
+                customGraphics: 0.3,
+                videoProduction: 0.35,
+                translation: 0.15,
+                lmsIntegration: 300
             }
         };
 
-        const deliverables = [
-            { id: 'storyboard', name: 'Storyboard', emoji: '📄' },
-            { id: 'level1', name: 'eLearning Module Level 1', emoji: '🎓' },
-            { id: 'level2', name: 'eLearning Module Level 2', emoji: '🎓' },
-            { id: 'level3', name: 'eLearning Module Level 3', emoji: '🎓' },
-            { id: 'level4', name: 'eLearning Module Level 4', emoji: '🎓' }
-        ];
-
-        function calculatePrice() {
-            const currency = document.getElementById('currency').value;
-            const currencyRates = rates[currency];
-            let totalPrice = 0;
-            const breakdown = [];
-
-            deliverables.forEach(deliverable => {
-                const units = parseInt(document.getElementById(`${deliverable.id}-units`).value) || 0;
-                const slides = parseInt(document.getElementById(`${deliverable.id}-slides`).value) || 0;
-                const detail = parseFloat(document.getElementById(`${deliverable.id}-detail`).value);
-                const interactivity = parseFloat(document.getElementById(`${deliverable.id}-interactivity`).value);
-
-                if (units > 0) {
-                    const baseRate = currencyRates[deliverable.id];
-                    const unitPrice = baseRate * detail * interactivity;
-                    const slidesCost = slides * currencyRates.slideFactor * units;
-                    const subtotal = (units * unitPrice) + slidesCost;
-
-                    totalPrice += subtotal;
-
-                    const detailText = detail === 1.0 ? 'Basic' : detail === 1.25 ? 'Medium' : 'High';
-                    const interactivityText = interactivity === 1.0 ? 'Low' : interactivity === 1.15 ? 'Medium' : 'High';
-
-                    breakdown.push({
-                        name: deliverable.name,
-                        emoji: deliverable.emoji,
-                        units: units,
-                        slides: slides,
-                        detail: detailText,
-                        interactivity: interactivityText,
-                        unitPrice: unitPrice.toFixed(2),
-                        subtotal: subtotal.toFixed(2)
-                    });
-                }
+        // Handle calculation method switching
+        document.querySelectorAll('input[name="calcMethod"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                document.querySelectorAll('[id$="Group"]').forEach(g => g.style.display = 'none');
+                document.getElementById(e.target.value + 'Group').style.display = 'block';
             });
+        });
 
-            if (totalPrice === 0) {
-                alert('Please add at least one deliverable with units.');
-                return;
+        // Handle interactivity card selection
+        document.querySelectorAll('.interactivity-card').forEach(card => {
+            card.addEventListener('click', () => {
+                document.querySelectorAll('.interactivity-card').forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+            });
+        });
+
+        // Calculate total words based on method
+        function calculateWords() {
+            const method = document.querySelector('input[name="calcMethod"]:checked').value;
+            let words = 0;
+
+            switch(method) {
+                case 'words':
+                    words = parseInt(document.getElementById('wordCount').value) || 0;
+                    break;
+                case 'slides':
+                    words = (parseInt(document.getElementById('slideCount').value) || 0) * 125;
+                    break;
+                case 'minutes':
+                    words = (parseInt(document.getElementById('minuteCount').value) || 0) * 90;
+                    break;
+                case 'hours':
+                    words = (parseFloat(document.getElementById('hourCount').value) || 0) * 60 * 90;
+                    break;
             }
 
-            displayResults(totalPrice, currency, breakdown);
+            return words;
         }
 
-        function displayResults(total, currency, breakdown) {
-            const minRange = (total * 0.9).toFixed(2);
-            const maxRange = (total * 1.1).toFixed(2);
+        // Form submission
+        document.getElementById('calculatorForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            calculateCost();
+        });
 
-            document.getElementById('totalAmount').textContent = `${formatNumber(total.toFixed(2))} ${currency}`;
-            document.getElementById('priceRange').textContent = `Range: ${formatNumber(minRange)} - ${formatNumber(maxRange)} ${currency}`;
+        function calculateCost() {
+            const currency = document.getElementById('currency').value;
+            const words = calculateWords();
+            const interactivity = parseInt(document.querySelector('input[name="interactivity"]:checked').value);
+            const rates = pricing[currency];
 
-            const breakdownBody = document.getElementById('breakdownBody');
-            breakdownBody.innerHTML = '';
+            let breakdown = [];
+            let total = 0;
 
-            breakdown.forEach(item => {
-                const row = `
-                    <tr>
-                        <td>${item.emoji} ${item.name}</td>
-                        <td>${item.units}</td>
-                        <td>${item.slides}</td>
-                        <td>${item.detail}</td>
-                        <td>${item.interactivity}</td>
-                        <td>${formatNumber(item.unitPrice)} ${currency}</td>
-                        <td><strong>${formatNumber(item.subtotal)} ${currency}</strong></td>
-                    </tr>
-                `;
-                breakdownBody.innerHTML += row;
+            // Base content development
+            const baseCost = words * rates.baseRate[interactivity];
+            breakdown.push({label: 'Content Development & Interactivity', cost: baseCost});
+            total += baseCost;
+
+            // Voice over
+            if (document.getElementById('voiceover').checked) {
+                const voCost = words * rates.voiceover;
+                breakdown.push({label: 'Professional Voice Over', cost: voCost});
+                total += voCost;
+            }
+
+            // Gamification
+            if (document.getElementById('gamification').checked) {
+                const gameCost = words * rates.gamification;
+                breakdown.push({label: 'Gamification Elements', cost: gameCost});
+                total += gameCost;
+            }
+
+            // Custom Graphics
+            if (document.getElementById('customGraphics').checked) {
+                const graphicsCost = words * rates.customGraphics;
+                breakdown.push({label: 'Custom Graphics & Illustrations', cost: graphicsCost});
+                total += graphicsCost;
+            }
+
+            // Video Production
+            if (document.getElementById('videoProduction').checked) {
+                const videoCost = words * rates.videoProduction;
+                breakdown.push({label: 'Video Production', cost: videoCost});
+                total += videoCost;
+            }
+
+            // Translation
+            if (document.getElementById('translation').checked) {
+                const translationCost = words * rates.translation;
+                breakdown.push({label: 'Translation & Localization', cost: translationCost});
+                total += translationCost;
+            }
+
+            // LMS Integration
+            if (document.getElementById('lmsIntegration').checked) {
+                breakdown.push({label: 'LMS Integration & SCORM', cost: rates.lmsIntegration});
+                total += rates.lmsIntegration;
+            }
+
+            displayResults(breakdown, total, currency);
+        }
+
+        function displayResults(breakdown, total, currency) {
+            const breakdownHTML = breakdown.map(item => `
+                <div class="cost-item">
+                    <span>${item.label}</span>
+                    <strong>${formatCurrency(item.cost, currency)}</strong>
+                </div>
+            `).join('');
+
+            document.getElementById('costBreakdown').innerHTML = breakdownHTML;
+            document.getElementById('totalCost').innerHTML = formatCurrency(total, currency);
+
+            // Payment milestones
+            const milestone1 = total * 0.5;
+            const milestone2 = total * 0.2;
+            const milestone3 = total * 0.3;
+
+            const milestonesHTML = `
+                <div class="milestone-item">
+                    <span><strong>Milestone 1:</strong> Project Kickoff & Requirements (50%)</span>
+                    <strong>${formatCurrency(milestone1, currency)}</strong>
+                </div>
+                <div class="milestone-item">
+                    <span><strong>Milestone 2:</strong> First Prototype Delivery (20%)</span>
+                    <strong>${formatCurrency(milestone2, currency)}</strong>
+                </div>
+                <div class="milestone-item">
+                    <span><strong>Milestone 3:</strong> Final Product Delivery (30%)</span>
+                    <strong>${formatCurrency(milestone3, currency)}</strong>
+                </div>
+            `;
+
+            document.getElementById('milestones').innerHTML = milestonesHTML;
+            document.getElementById('results').classList.add('show');
+            document.getElementById('results').scrollIntoView({behavior: 'smooth', block: 'nearest'});
+        }
+
+        function formatCurrency(amount, currency) {
+            return `${amount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} ${currency}`;
+        }
+
+        // PDF Download
+        document.getElementById('downloadPDF').addEventListener('click', () => {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            const projectName = document.getElementById('projectName').value || 'eLearning Project';
+            const currency = document.getElementById('currency').value;
+            const words = calculateWords();
+            const interactivity = parseInt(document.querySelector('input[name="interactivity"]:checked').value);
+            const date = new Date().toLocaleDateString('en-GB');
+
+            // Header
+            doc.setFillColor(13, 115, 119);
+            doc.rect(0, 0, 210, 40, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(24);
+            doc.text('PROJECT COST ESTIMATE - MENA Region', 105, 20, {align: 'center'});
+            doc.setFontSize(12);
+            doc.text('Professional eLearning Cost Calcultor', 105, 30, {align: 'center'});
+
+            // Project Details
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(11);
+            let y = 55;
+            doc.text(`Project Name: ${projectName}`, 20, y);
+            doc.text(`Date: ${date}`, 150, y);
+            y += 10;
+            doc.text(`Total Words: ${words.toLocaleString()}`, 20, y);
+            doc.text(`Interactivity: Level ${interactivity}`, 150, y);
+
+            // Cost Breakdown
+            y += 15;
+            doc.setFontSize(14);
+            doc.setTextColor(13, 115, 119);
+            doc.text('COST BREAKDOWN', 20, y);
+            
+            y += 10;
+            doc.setFontSize(10);
+            doc.setTextColor(0, 0, 0);
+            
+            const breakdownItems = Array.from(document.querySelectorAll('#costBreakdown .cost-item'));
+            breakdownItems.forEach(item => {
+                const label = item.querySelector('span').textContent;
+                const cost = item.querySelector('strong').textContent;
+                doc.text(label, 20, y);
+                doc.text(cost, 180, y, {align: 'right'});
+                y += 8;
             });
 
-            const paymentBody = document.getElementById('paymentBody');
-            paymentBody.innerHTML = '';
+            // Total
+            y += 10;
+            doc.setFillColor(13, 115, 119);
+            doc.rect(15, y - 5, 180, 12, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(14);
+            doc.text('TOTAL PROJECT COST:', 20, y + 3);
+            doc.text(document.getElementById('totalCost').textContent, 180, y + 3, {align: 'right'});
 
+            // Payment Milestones
+            y += 25;
+            doc.setTextColor(13, 115, 119);
+            doc.text('PAYMENT MILESTONES', 20, y);
+            
+            y += 10;
+            doc.setFontSize(10);
+            doc.setTextColor(0, 0, 0);
+            
+            // const milestoneItems = Array.from(document.querySelectorAll('.milestone-item'));
+            // milestoneItems.forEach(item => {
+            //     const text = item.querySelector('span').textContent;
+            //     const amount = item.querySelector('strong').textContent;
+            //     const lines = doc.splitTextToSize(text, 130);
+            //     doc.text(lines, 20, y);
+            //     doc.text(amount, 180, y, {align: 'right'});
+            //     y += 10;
+            // });
+            const totalText = document.getElementById('totalCost').textContent.replace(/[^\d.]/g, '');
+            const total = parseFloat(totalText) || 0;
+
+            // Calculate payment milestones
+            const milestone1 = total * 0.5;
+            const milestone2 = total * 0.2;
+            const milestone3 = total * 0.3;
             const milestones = [
-                { stage: 'Upfront (Before Start)', percent: 50 },
-                { stage: 'Milestone 1', percent: 20 },
-                { stage: 'Milestone 2', percent: 20 },
-                { stage: 'Final Delivery', percent: 10 }
+                { label: 'Milestone 1: 50% on Project Kickoff', amount: milestone1 },
+                { label: 'Milestone 2: 20% on First Draft Delivery', amount: milestone2 },
+                { label: 'Milestone 3: 30% on Final Delivery', amount: milestone3 },
             ];
 
-            milestones.forEach(milestone => {
-                const amount = (total * milestone.percent / 100).toFixed(2);
-                const row = `
-                    <tr>
-                        <td>${milestone.stage}</td>
-                        <td>${milestone.percent}%</td>
-                        <td><strong>${formatNumber(amount)} ${currency}</strong></td>
-                    </tr>
-                `;
-                paymentBody.innerHTML += row;
+            milestones.forEach(m => {
+                doc.text(m.label, 20, y);
+                doc.text(`${m.amount.toLocaleString()} ${currency}`, 180, y, { align: 'right' });
+                y += 10;
             });
 
-            document.getElementById('results').classList.add('show');
-            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
-        }
+            // Footer
+            doc.setFontSize(8);
+            doc.setTextColor(100, 100, 100);
+            doc.text('This invoice issued using The Professional eLearning Cost Calculator.', 105, 280, {align: 'center'});
+            doc.text('Valid for 30 days from the date of issue.', 105, 285, {align: 'center'});
 
-        function formatNumber(num) {
-            return parseFloat(num).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        }
-
-        function resetForm() {
-            deliverables.forEach(deliverable => {
-                document.getElementById(`${deliverable.id}-units`).value = 0;
-                document.getElementById(`${deliverable.id}-slides`).value = 0;
-                document.getElementById(`${deliverable.id}-detail`).value = '1.0';
-                document.getElementById(`${deliverable.id}-interactivity`).value = '1.0';
-            });
-
-            document.getElementById('results').classList.remove('show');
-        }
+            doc.save(`${projectName.replace(/\s+/g, '_')}_Cost_Estimate.pdf`);
+        });
+        document.addEventListener('keydown', function(e) {
+    if (
+        e.key === 'F12' ||
+        (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'C')) ||
+        (e.ctrlKey && e.key.toLowerCase() === 'u') || (e.ctrlKey && e.key.toLowerCase() === 's')
+    ) {
+        e.preventDefault();
+        return false;
+    }
+    });
+    document.addEventListener('contextmenu', e => e.preventDefault());
     </script>
 </body>
 </html>
